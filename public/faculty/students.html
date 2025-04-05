@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students | EduFutur</title>
+    <!-- CDN Imports -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@framerjs/dom@0.1.0/dist/framer.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #0ea5e9;
+            --secondary: #7dd3fc;
+            --accent: #f59e0b;
+            --dark: #0f172a;
+            --light: #e2e8f0;
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif;
+            cursor: none; 
+            background-color: var(--dark); 
+            color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        /* Custom Cursor */
+        .custom-cursor {
+            position: fixed; 
+            width: 12px; 
+            height: 12px; 
+            border-radius: 50%;
+            background: var(--primary); 
+            pointer-events: none;
+            mix-blend-mode: screen; 
+            z-index: 9999; 
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease;
+        }
+        
+        .cursor-follower {
+            position: fixed; 
+            width: 30px; 
+            height: 30px; 
+            border: 1px solid rgba(101, 163, 255, 0.5);
+            border-radius: 50%; 
+            pointer-events: none; 
+            z-index: 9998;
+            transform: translate(-50%, -50%); 
+            transition: transform 0.4s ease, width 0.4s ease, height 0.4s ease, background 0.2s ease;
+        }
+        
+        .cursor-active .custom-cursor {
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+        }
+        
+        .cursor-active .cursor-follower {
+            width: 50px; 
+            height: 50px; 
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+        
+        .cursor-click .cursor-follower {
+            width: 40px;
+            height: 40px;
+            background: rgba(245, 158, 11, 0.2);
+        }
+        
+        /* Glass Morphism */
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Gradient Text */
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Animated Underline */
+        .underline-animate {
+            position: relative;
+        }
+        
+        .underline-animate:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .underline-animate:hover:after {
+            width: 100%;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-slate-900 text-slate-100">
+    <!-- Custom Cursor Elements -->
+    <div class="custom-cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-slate-800/80 backdrop-blur-md border-r border-slate-700">
+            <div class="p-4 border-b border-slate-700">
+                <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 gradient-text">Faculty Portal</h1>
+            </div>
+            <nav class="p-4 space-y-2">
+                <a href="dashboard.html" class="block px-4 py-2 rounded-lg hover:bg-slate-700/50 text-slate-300 transition-colors">Dashboard</a>
+                <a href="courses.html" class="block px-4 py-2 rounded-lg hover:bg-slate-700/50 text-slate-300 transition-colors">My Courses</a>
+                <a href="assignments.html" class="block px-4 py-2 rounded-lg hover:bg-slate-700/50 text-slate-300 transition-colors">Assignments</a>
+                <a href="students.html" class="block px-4 py-2 rounded-lg bg-slate-700/50 text-white">Students</a>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <header class="bg-slate-800/80 backdrop-blur-md border-b border-slate-700 p-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">Student Performance</h2>
+                    <div class="flex space-x-2">
+                        <select class="px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white transition-colors">
+                            <option>All Courses</option>
+                            <option>CS-101</option>
+                            <option>CS-201</option>
+                        </select>
+                        <input type="text" placeholder="Search students..." class="px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white transition-colors">
+                    </div>
+                </div>
+            </header>
+            
+            <main class="p-6">
+                <div class="glass rounded-xl border border-slate-700 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-slate-700/50 text-slate-300">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">Student</th>
+                                    <th class="px-6 py-3 text-left">Course</th>
+                                    <th class="px-6 py-3 text-left">Assignments</th>
+                                    <th class="px-6 py-3 text-left">Average</th>
+                                    <th class="px-6 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700">
+                                <tr class="hover:bg-slate-800/50 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold mr-3">JD</div>
+                                            <div>
+                                                <p class="font-medium">John Doe</p>
+                                                <p class="text-sm text-slate-400">john@edufutur.edu</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">CS-201</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-full bg-slate-700 rounded-full h-2.5 mr-2">
+                                                <div class="bg-blue-500 h-2.5 rounded-full" style="width: 85%"></div>
+                                            </div>
+                                            <span>85%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">A-</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button class="px-3 py-1 rounded-md text-sm bg-cyan-600 hover:bg-cyan-700 text-white transition-colors">
+                                            View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/50 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white font-semibold mr-3">AS</div>
+                                            <div>
+                                                <p class="font-medium">Alice Smith</p>
+                                                <p class="text-sm text-slate-400">alice@edufutur.edu</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">CS-101</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-full bg-slate-700 rounded-full h-2.5 mr-2">
+                                                <div class="bg-purple-500 h-2.5 rounded-full" style="width: 72%"></div>
+                                            </div>
+                                            <span>72%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">B</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button class="px-3 py-1 rounded-md text-sm bg-cyan-600 hover:bg-cyan-700 text-white transition-colors">
+                                            View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/50 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white font-semibold mr-3">RJ</div>
+                                            <div>
+                                                <p class="font-medium">Robert Johnson</p>
+                                                <p class="text-sm text-slate-400">robert@edufutur.edu</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">CS-201</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-full bg-slate-700 rounded-full h-2.5 mr-2">
+                                                <div class="bg-amber-500 h-2.5 rounded-full" style="width: 93%"></div>
+                                            </div>
+                                            <span>93%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">A</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button class="px-3 py-1 rounded-md text-sm bg-cyan-600 hover:bg-cyan-700 text-white transition-colors">
+                                            View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/50 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white font-semibold mr-3">MB</div>
+                                            <div>
+                                                <p class="font-medium">Maria Brown</p>
+                                                <p class="text-sm text-slate-400">maria@edufutur.edu</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">CS-101</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-full bg-slate-700 rounded-full h-2.5 mr-2">
+                                                <div class="bg-emerald-500 h-2.5 rounded-full" style="width: 65%"></div>
+                                            </div>
+                                            <span>65%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">C+</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button class="px-3 py-1 rounded-md text-sm bg-cyan-600 hover:bg-cyan-700 text-white transition-colors">
+                                            View
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Custom Cursor
+        const cursor = document.querySelector('.custom-cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            setTimeout(() => {
+                cursorFollower.style.left = e.clientX + 'px';
+                cursorFollower.style.top = e.clientY + 'px';
+            }, 100);
+        });
+        
+        // Cursor Effects on Hover
+        const hoverElements = document.querySelectorAll('a, button, input, select, .hover-effect');
+        
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                document.body.classList.add('cursor-active');
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                document.body.classList.remove('cursor-active');
+            });
+            
+            el.addEventListener('mousedown', () => {
+                document.body.classList.add('cursor-click');
+            });
+            
+            el.addEventListener('mouseup', () => {
+                document.body.classList.remove('cursor-click');
+            });
+        });
+
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Animate table rows on load
+        gsap.from("tbody tr", {
+            duration: 0.8,
+            opacity: 0,
+            y: 20,
+            stagger: 0.1,
+            ease: "power2.out"
+        });
+    </script>
+</body>
+</html>

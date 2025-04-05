@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduFutur - Next-Gen Learning Platform</title>
+    <!-- CDN Imports -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@framerjs/dom@0.1.0/dist/framer.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #0ea5e9;
+            --secondary: #7dd3fc;
+            --accent: #f59e0b;
+            --dark: #0f172a;
+            --light: #e2e8f0;
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif;
+            cursor: none; 
+            background-color: var(--dark); 
+            color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        /* Custom Cursor */
+        .custom-cursor {
+            position: fixed; 
+            width: 12px; 
+            height: 12px; 
+            border-radius: 50%;
+            background: var(--primary); 
+            pointer-events: none;
+            mix-blend-mode: screen; 
+            z-index: 9999; 
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease;
+        }
+        
+        .cursor-follower {
+            position: fixed; 
+            width: 30px; 
+            height: 30px; 
+            border: 1px solid rgba(101, 163, 255, 0.5);
+            border-radius: 50%; 
+            pointer-events: none; 
+            z-index: 9998;
+            transform: translate(-50%, -50%); 
+            transition: transform 0.4s ease, width 0.4s ease, height 0.4s ease, background 0.2s ease;
+        }
+        
+        .cursor-active .custom-cursor {
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+        }
+        
+        .cursor-active .cursor-follower {
+            width: 50px; 
+            height: 50px; 
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+        
+        .cursor-click .cursor-follower {
+            width: 40px;
+            height: 40px;
+            background: rgba(245, 158, 11, 0.2);
+        }
+        
+        /* Glass Morphism */
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Gradient Text */
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Animated Underline */
+        .underline-animate {
+            position: relative;
+        }
+        
+        .underline-animate:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .underline-animate:hover:after {
+            width: 100%;
+        }
+        
+        /* Floating Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* Grid Pattern */
+        .grid-pattern {
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-slate-900 text-slate-100">
+    <!-- Custom Cursor Elements -->
+    <div class="custom-cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="#" class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 gradient-text flex items-center">
+                            <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_vybwn7df.json" background="transparent" speed="1" style="width: 40px; height: 40px;" loop autoplay></lottie-player>
+                            <span class="ml-2">EduFutur</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-slate-300 hover:text-white transition-colors underline-animate">Features</a>
+                    <a href="#how-it-works" class="text-slate-300 hover:text-white transition-colors underline-animate">How It Works</a>
+                    <a href="#testimonials" class="text-slate-300 hover:text-white transition-colors underline-animate">About Us</a>
+                    <a href="#pricing" class="text-slate-300 hover:text-white transition-colors underline-animate">Pricing</a>
+                    <a href="login.html" class="px-4 py-2 rounded-md text-sm font-medium bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700 transition-all shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30">
+                        Login
+                    </a>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-slate-300 hover:text-white focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-900/95 backdrop-blur-lg border-t border-slate-800">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#features" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800">Features</a>
+                <a href="#how-it-works" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800">How It Works</a>
+                <a href="#testimonials" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800">About Us</a>
+                <a href="#pricing" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800">Pricing</a>
+                <a href="login.html" class="block px-3 py-2 rounded-md text-base font-medium bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-center">
+                    Login
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative h-screen flex items-center justify-center overflow-hidden pt-20">
+        <!-- Background Elements -->
+        <div class="absolute inset-0 z-0 grid-pattern">
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-900/80 to-slate-900"></div>
+            <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center opacity-20"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(8,145,178,0.1)_0,_transparent_70%)]"></div>
+            
+            <!-- Floating Particles -->
+            <div class="absolute top-1/4 left-1/4 w-4 h-4 rounded-full bg-cyan-400/30 blur-sm floating" style="animation-delay: 0s;"></div>
+            <div class="absolute top-1/3 right-1/3 w-3 h-3 rounded-full bg-blue-400/30 blur-sm floating" style="animation-delay: 1s;"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-5 h-5 rounded-full bg-amber-400/30 blur-sm floating" style="animation-delay: 2s;"></div>
+            <div class="absolute bottom-1/3 left-1/3 w-2 h-2 rounded-full bg-indigo-400/30 blur-sm floating" style="animation-delay: 3s;"></div>
+        </div>
+        
+        <!-- Hero Content -->
+        <div class="relative z-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
+            <div class="inline-block mb-6 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700 text-sm text-cyan-400">
+                <span class="mr-2">🚀</span> Next Generation Learning Platform
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 gradient-text leading-tight">
+                Transform Education <br class="hidden md:block"/> With AI
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto mb-10">
+                A comprehensive platform bridging the gap between faculty and students with cutting-edge technology and personalized learning experiences.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="login.html" class="px-8 py-4 rounded-lg text-lg font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700 transition-all shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 transform hover:scale-105 active:scale-95">
+                    Get Started <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+                <a href="#features" class="px-8 py-4 rounded-lg text-lg font-semibold bg-slate-800/50 text-white hover:bg-slate-700/50 transition-all border border-slate-700 hover:border-slate-600 transform hover:scale-105 active:scale-95">
+                    Explore Features
+                </a>
+            </div>
+            
+            <!-- Stats -->
+            <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                <div class="glass p-6 rounded-xl border border-slate-800">
+                    <div class="text-3xl font-bold text-cyan-400">50K+</div>
+                    <div class="text-sm text-slate-400">Students</div>
+                </div>
+                <div class="glass p-6 rounded-xl border border-slate-800">
+                    <div class="text-3xl font-bold text-blue-400">5K+</div>
+                    <div class="text-sm text-slate-400">Educators</div>
+                </div>
+                <div class="glass p-6 rounded-xl border border-slate-800">
+                    <div class="text-3xl font-bold text-indigo-400">100+</div>
+                    <div class="text-sm text-slate-400">Institutions</div>
+                </div>
+                <div class="glass p-6 rounded-xl border border-slate-800">
+                    <div class="text-3xl font-bold text-amber-400">24/7</div>
+                    <div class="text-sm text-slate-400">Support</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
+            <div class="flex flex-col items-center">
+                <span class="text-sm text-slate-400 mb-2">Scroll Down</span>
+                <div class="w-6 h-10 border-2 border-slate-400 rounded-full flex justify-center">
+                    <div class="w-1 h-2 bg-slate-400 rounded-full mt-2 animate-bounce"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-gradient-to-b from-slate-900 to-slate-900/90 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full opacity-10">
+            <div class="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 gradient-text">Powerful Features</h2>
+                <p class="text-xl text-slate-400 max-w-3xl mx-auto">Discover how EduFutur is revolutionizing education with cutting-edge technology</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+               <a href="chatbot.html"> <div class="glass p-8 rounded-xl border border-slate-800 hover:border-cyan-500/30 transition-all transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-6">
+                        <lottie-player src="https://assets10.lottiefiles.com/packages/lf20_gn0tojcq.json" background="transparent" speed="1" style="width: 40px; height: 40px;" loop autoplay></lottie-player>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">AI-Powered Learning</h3>
+                    <p class="text-slate-400">Our adaptive learning algorithms tailor content to each student's needs, ensuring optimal knowledge retention and engagement.</p>
+                </div>
+                </a>
+                <!-- Feature 2 -->
+                 <a href="/student/grades.html">
+                <div class="glass p-8 rounded-xl border border-slate-800 hover:border-blue-500/30 transition-all transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-blue-500/10 rounded-lg flex items-center justify-center mb-6">
+                        <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_5tkzkblw.json" background="transparent" speed="1" style="width: 40px; height: 40px;" loop autoplay></lottie-player>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Real-Time Analytics</h3>
+                    <p class="text-slate-400">Track student progress with comprehensive dashboards that provide actionable insights for educators and administrators.</p>
+                </div>
+                </a>
+                <!-- Feature 3 -->
+                <a href="https://github.com/"><div class="glass p-8 rounded-xl border border-slate-800 hover:border-indigo-500/30 transition-all transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-indigo-500/10 rounded-lg flex items-center justify-center mb-6">
+                        <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_ws4wfbpv.json" background="transparent" speed="1" style="width: 40px; height: 40px;" loop autoplay></lottie-player>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Collaborative Tools</h3>
+                    <p class="text-slate-400">Foster teamwork with integrated discussion forums, group projects, and peer review systems that enhance learning outcomes.</p>
+                </div>
+                </a>
+                <!-- Feature 4 -->
+                <a href="gaming.html"><div class="glass p-8 rounded-xl border border-slate-800 hover:border-amber-500/30 transition-all transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-amber-500/10 rounded-lg flex items-center justify-center mb-6">
+                        <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_1a8dx7zj.json" background="transparent" speed="1" style="width: 40px; height: 40px;" loop autoplay></lottie-player>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Gamification</h3>
+                    <p class="text-slate-400">Boost engagement with badges, leaderboards, and rewards that make learning fun and motivate students to achieve more.</p>
+                </div>
+                </a>
+                <!-- Feature 5 -->
+                 <a href="https://www.apnacollege.in/">
+                <div class="glass p-8 rounded-xl border border-slate-800 hover:border-purple-500/30 transition-all transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-purple-500/10 rounded-lg flex items-center justify-center mb-6">
+                        <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_5tkzkblw.json" background="transparent" speed="1" style="width: 40px; height: 40px;" loop autoplay></lottie-player>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Virtual Classrooms</h3>
+                    <p class="text-slate-400">Conduct live sessions with interactive whiteboards, breakout rooms, and real-time feedback for a seamless virtual experience.</p>
+                </div>
+                 </a>
+                <!-- Feature 6 -->
+               <a href="https://www.w3schools.com/"> 
+                <div class="glass p-8 rounded-xl border border-slate-800 hover:border-emerald-500/30 transition-all transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-emerald-500/10 rounded-lg flex items-center justify-center mb-6">
+                        <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_5tkzkblw.json" background="transparent" speed="1" style="width: 40px; height: 40px;" loop autoplay></lottie-player>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Content Library</h3>
+                    <p class="text-slate-400">Access a vast repository of high-quality educational resources, from interactive textbooks to multimedia presentations.</p>
+                </div>
+            </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-20 bg-slate-900 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(14,165,233,0.1)_0,_transparent_70%)]"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-amber-400 to-orange-500 gradient-text">How It Works</h2>
+                <p class="text-xl text-slate-400 max-w-3xl mx-auto">Simple steps to transform your educational experience</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="glass p-8 rounded-xl border border-slate-800 relative overflow-hidden">
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-xl"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mb-6">
+                            <span class="text-2xl font-bold text-amber-400">1</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Sign Up</h3>
+                        <p class="text-slate-400 mb-4">Create your account as a student, educator, or institution administrator in just a few simple steps.</p>
+                        <div class="flex justify-center">
+                            <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_5tkzkblw.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="glass p-8 rounded-xl border border-slate-800 relative overflow-hidden">
+                    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-xl"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mb-6">
+                            <span class="text-2xl font-bold text-blue-400">2</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Set Up Your Profile</h3>
+                        <p class="text-slate-400 mb-4">Customize your learning or teaching preferences, connect with your institution, and set your goals.</p>
+                        <div class="flex justify-center">
+                            <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_5tkzkblw.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="glass p-8 rounded-xl border border-slate-800 relative overflow-hidden">
+                    <div class="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/10 rounded-full blur-xl"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 bg-cyan-500/10 rounded-full flex items-center justify-center mb-6">
+                            <span class="text-2xl font-bold text-cyan-400">3</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Start Learning/Teaching</h3>
+                        <p class="text-slate-400 mb-4">Access courses, create content, engage with students, and track progress with our intuitive platform.</p>
+                        <div class="flex justify-center">
+                            <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_5tkzkblw.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-20 bg-gradient-to-b from-slate-900/90 to-slate-900 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-500 gradient-text">About Us</h2>
+                <p class="text-xl text-slate-400 max-w-3xl mx-auto">Hear from educators and students who have transformed their learning experience</p>
+            </div>
+            
+            <div class="splide" aria-label="Testimonials Slider">
+                <div class="splide__track">
+                    <ul class="splide__list">
+                        <li class="splide__slide">
+                            <div class="glass p-8 rounded-xl border border-slate-800">
+                                <div class="flex items-center mb-6">
+                                    <img src="WhatsApp Image 2025-04-04 at 19.04.23_b03a558d.jpg" alt="Subham Subhadarsan sahoo" class="w-12 h-12 rounded-full border-2 border-cyan-500">
+                                    <div class="ml-4">
+                                        <h4 class="font-bold text-white">Subham Subhadarsan Sahoo</h4>
+                                        <p class="text-sm text-slate-400">Student at ITER</p>
+                                    </div>
+                                </div>
+                                <p class="text-slate-300 italic mb-6">"EduFutur has completely transformed how I engage with my teachers. The analytics help me identify my weakness, and the platform's tools make content delivery seamless."</p>
+                                <div class="flex text-amber-400">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="splide__slide">
+                            <div class="glass p-8 rounded-xl border border-slate-800">
+                                <div class="flex items-center mb-6">
+                                    <img src="WhatsApp Image 2025-04-04 at 19.01.54_0a9dcd1b.jpg" alt="Michael Chen" class="w-12 h-12 rounded-full border-2 border-blue-500">
+                                    <div class="ml-4">
+                                        <h4 class="font-bold text-white">Roshan Panda</h4>
+                                        <p class="text-sm text-slate-400">Student at ITER</p>
+                                    </div>
+                                </div>
+                                <p class="text-slate-300 italic mb-6">"The personalized learning paths have helped me grasp complex concepts faster than ever. I love how the platform adapts to my learning style and pace."</p>
+                                <div class="flex text-amber-400">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="splide__slide">
+                            <div class="glass p-8 rounded-xl border border-slate-800">
+                                <div class="flex items-center mb-6">
+                                    <img src="WhatsApp Image 2025-04-04 at 19.14.40_e077025d.jpg" alt="Emma Rodriguez" class="w-12 h-12 rounded-full border-2 border-purple-500">
+                                    <div class="ml-4">
+                                        <h4 class="font-bold text-white">Abhishka Mishra</h4>
+                                        <p class="text-sm text-slate-400">Student at ITER</p>
+                                    </div>
+                                </div>
+                                <p class="text-slate-300 italic mb-6">"Implementing EduFutur across our district has led to measurable improvements in my outcomes. The centralized platform makes management effortless."</p>
+                                <div class="flex text-amber-400">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 bg-slate-900 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(124,58,237,0.1)_0,_transparent_70%)]"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-emerald-400 to-teal-500 gradient-text">Simple, Transparent Pricing</h2>
+                <p class="text-xl text-slate-400 max-w-3xl mx-auto">Choose the plan that fits your needs</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Student Plan -->
+                <div class="glass p-8 rounded-xl border border-slate-800 hover:border-cyan-500/50 transition-all transform hover:scale-105">
+                    <div class="mb-6">
+                        <h3 class="text-2xl font-bold text-white mb-2">Student</h3>
+                        <p class="text-slate-400">Perfect for individual learners</p>
+                    </div>
+                    <div class="mb-8">
+                        <span class="text-5xl font-bold text-white">$9</span>
+                        <span class="text-slate-400">/month</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check text-cyan-400 mr-2"></i> Access to all courses
+                        </li>
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check text-cyan-400 mr-2"></i> Personalized learning paths
+                        </li>
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check text-cyan-400 mr-2"></i> Basic analytics
+                        </li>
+                        <li class="flex items-center text-slate-400">
+                            <i class="fas fa-times text-slate-600 mr-2"></i> Educator tools
+                        </li>
+                        <li class="flex items-center text-slate-400">
+                            <i class="fas fa-times text-slate-600 mr-2"></i> Institutional features
+                        </li>
+                    </ul>
+                    <a href="login.html" class="block w-full py-3 px-6 text-center rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700 transition-all">
+                        Get Started
+                    </a>
+                </div>
+                
+                <!-- Educator Plan -->
+                <div class="glass p-8 rounded-xl border border-blue-500/30 bg-gradient-to-b from-blue-900/20 to-blue-900/0 transform hover:scale-105 relative overflow-hidden">
+                    <div class="absolute top-4 right-4 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">POPULAR</div>
+                    <div class="mb-6">
+                        <h3 class="text-2xl font-bold text-white mb-2">Educator</h3>
+                        <p class="text-slate-400">For teachers and professors</p>
+                    </div>
+                    <div class="mb-8">
+                        <span class="text-5xl font-bold text-white">$29</span>
+                        <span class="text-slate-400">/month</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check text-blue-400 mr-2"></i> All Student features
+                        </li>
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check text-blue-400 mr-2"></i> Course creation tools
+                        </li>
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check text-blue-400 mr-2"></i> Advanced analytics
+                        </li>
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check text-blue-400 mr-2"></i> Student management
+                        </li>
+                        <li class="flex items-center text-slate-400">
+                            <i class="fas fa-times text-slate-600 mr-2"></i> Institutional features
+                        </li>
+                    </ul>
+                    <a href="login.html" class="block w-full py-3 px-6 text-center rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 transition-all">
+                        Get Started
+                    </a>
+                </div>
+                
+                <!-- Institution Plan -->
+                <div class="glass p-8 rounded-xl border border-slate-800 hover:border-purple-500/50 transition-all transform hover:scale-105">
+                    <div class="mb-6">
+                        <h3 class="text-2xl font-bold text-white mb-2">Institution</h3>
+                        <p class="text-slate-400">For schools and universities</p>
+                    </div>
+                    <div class="mb-8">
+                        <span class="text-5xl font-bold text-white">Custom</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check text-purple-400 mr-2"></i> All Educator features
+                        </li>
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check text-purple-400 mr-2"></i> Admin dashboard
+                        </li>
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check text-purple-400 mr-2"></i> Bulk user management
+                        </li>
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check text-purple-400 mr-2"></i> Custom branding
+                        </li>
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check text-purple-400 mr-2"></i> Dedicated support
+                        </li>
+                    </ul>
+                    <a href="login.html" class="block w-full py-3 px-6 text-center rounded-lg bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:from-purple-600 hover:to-pink-700 transition-all">
+                        Contact Sales
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-br from-slate-900 to-blue-900/30 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(14,165,233,0.1)_0,_transparent_70%)]"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="glass p-12 rounded-2xl border border-slate-800 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 gradient-text">Ready to Transform Education?</h2>
+                <p class="text-xl text-slate-300 max-w-3xl mx-auto mb-10">Join thousands of educators and students who are already experiencing the future of learning.</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="login.html" class="px-8 py-4 rounded-lg text-lg font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700 transition-all shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 transform hover:scale-105">
+                        Get Started for Free
+                    </a>
+                    <a href="#pricing" class="px-8 py-4 rounded-lg text-lg font-semibold bg-slate-800/50 text-white hover:bg-slate-700/50 transition-all border border-slate-700 hover:border-slate-600 transform hover:scale-105">
+                        View Pricing
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900/80 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-4">EduFutur</h3>
+                    <p class="text-slate-400">The next-generation platform for modern education, powered by AI and designed for the future.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-4">Product</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#features" class="text-slate-400 hover:text-white transition-colors">Features</a></li>
+                        <li><a href="#pricing" class="text-slate-400 hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Integrations</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Updates</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Tutorials</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-4">Company</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">About</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Privacy</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Terms</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-slate-400">© 2023 EduFutur. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="#" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="#" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Initialize Splide (Testimonials Slider)
+        new Splide('.splide', {
+            type: 'loop',
+            perPage: 1,
+            perMove: 1,
+            gap: '2rem',
+            pagination: false,
+            breakpoints: {
+                768: {
+                    perPage: 1,
+                }
+            }
+        }).mount();
+        
+        // Custom Cursor
+        const cursor = document.querySelector('.custom-cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            setTimeout(() => {
+                cursorFollower.style.left = e.clientX + 'px';
+                cursorFollower.style.top = e.clientY + 'px';
+            }, 100);
+        });
+        
+        // Cursor Effects on Hover
+        const hoverElements = document.querySelectorAll('a, button, .underline-animate, .splide__slide');
+        
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                document.body.classList.add('cursor-active');
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                document.body.classList.remove('cursor-active');
+            });
+            
+            el.addEventListener('mousedown', () => {
+                document.body.classList.add('cursor-click');
+            });
+            
+            el.addEventListener('mouseup', () => {
+                document.body.classList.remove('cursor-click');
+            });
+        });
+        
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Animate sections on scroll
+        gsap.utils.toArray('section').forEach(section => {
+            gsap.from(section, {
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top 80%",
+                    toggleActions: "play none none none"
+                },
+                opacity: 0,
+                y: 50,
+                duration: 1
+            });
+        });
+        
+        // Animate hero elements
+        gsap.from(".gradient-text", {
+            duration: 1.5,
+            opacity: 0,
+            y: -50,
+            ease: "power3.out"
+        });
+        
+        gsap.from("p.text-xl", {
+            duration: 1.5,
+            opacity: 0,
+            y: 20,
+            delay: 0.3,
+            ease: "power3.out"
+        });
+        
+        gsap.from(".flex.justify-center.gap-4 a", {
+            duration: 1.5,
+            opacity: 0,
+            y: 30,
+            delay: 0.6,
+            stagger: 0.2,
+            ease: "power3.out"
+        });
+        
+        // Floating particles animation
+        const particles = document.querySelectorAll('.floating');
+        particles.forEach((particle, index) => {
+            gsap.to(particle, {
+                y: 20,
+                duration: 3 + index,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
+        });
+    </script>
+</body>
+</html>

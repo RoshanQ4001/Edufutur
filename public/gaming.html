@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduFutur - Gamification Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { 
+            cursor: none; 
+            background-color: #0f172a; 
+        }
+        .custom-cursor, .cursor-follower { 
+            position: fixed; 
+            pointer-events: none; 
+            z-index: 9999; 
+        }
+        .custom-cursor { 
+            width: 20px; 
+            height: 20px; 
+            border-radius: 50%; 
+            background: rgba(101, 163, 255, 0.7); 
+        }
+        .cursor-follower { 
+            width: 40px; 
+            height: 40px; 
+            border: 2px solid rgba(101, 163, 255, 0.5); 
+            border-radius: 50%; 
+        }
+        .nav-active {
+            background: linear-gradient(to right, rgba(34, 211, 238, 0.1), rgba(6, 182, 212, 0.1));
+            border-left: 3px solid #06b6d4;
+            color: #06b6d4;
+        }
+        .nav-item:hover {
+            background: rgba(71, 85, 105, 0.3);
+        }
+        .section-content {
+            transition: opacity 0.3s ease;
+        }
+        .badge-card {
+            transition: all 0.3s ease;
+        }
+        .badge-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-slate-900 text-slate-100">
+    <div class="custom-cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Enhanced Header with Navigation -->
+    <header class="bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-sm sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-trophy text-cyan-400 text-2xl"></i>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">EduFutur Gamification</h1>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:block">
+                    <ul class="flex space-x-1 bg-slate-800/70 rounded-lg p-1 border border-slate-700/50">
+                        <li>
+                            <button id="nav-dashboard" class="nav-item px-4 py-2 rounded-md flex items-center space-x-2 text-slate-300 hover:text-cyan-400 transition nav-active">
+                                <i class="fas fa-home"></i>
+                                <span>Dashboard</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button id="nav-leaderboard" class="nav-item px-4 py-2 rounded-md flex items-center space-x-2 text-slate-300 hover:text-cyan-400 transition">
+                                <i class="fas fa-ranking-star"></i>
+                                <span>Leaderboard</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button id="nav-badges" class="nav-item px-4 py-2 rounded-md flex items-center space-x-2 text-slate-300 hover:text-cyan-400 transition">
+                                <i class="fas fa-medal"></i>
+                                <span>Badges</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button id="nav-quests" class="nav-item px-4 py-2 rounded-md flex items-center space-x-2 text-slate-300 hover:text-cyan-400 transition">
+                                <i class="fas fa-flag-checkered"></i>
+                                <span>Quests</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button id="nav-progress" class="nav-item px-4 py-2 rounded-md flex items-center space-x-2 text-slate-300 hover:text-cyan-400 transition">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Progress</span>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-button" class="md:hidden text-slate-300 hover:text-cyan-400">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <i class="fas fa-bell text-slate-300 hover:text-cyan-400 cursor-pointer text-xl"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-8 h-8 rounded-full border-2 border-cyan-400">
+                        <span class="text-slate-300 hidden md:inline">John D.</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu (Hidden by default) -->
+            <div id="mobile-menu" class="md:hidden hidden mt-4 bg-slate-800/70 rounded-lg border border-slate-700/50">
+                <ul class="space-y-1 p-2">
+                    <li>
+                        <button id="mobile-nav-dashboard" class="nav-item w-full text-left px-4 py-3 rounded-md flex items-center space-x-3 text-slate-300 hover:text-cyan-400 transition nav-active">
+                            <i class="fas fa-home w-5 text-center"></i>
+                            <span>Dashboard</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button id="mobile-nav-leaderboard" class="nav-item w-full text-left px-4 py-3 rounded-md flex items-center space-x-3 text-slate-300 hover:text-cyan-400 transition">
+                            <i class="fas fa-ranking-star w-5 text-center"></i>
+                            <span>Leaderboard</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button id="mobile-nav-badges" class="nav-item w-full text-left px-4 py-3 rounded-md flex items-center space-x-3 text-slate-300 hover:text-cyan-400 transition">
+                            <i class="fas fa-medal w-5 text-center"></i>
+                            <span>Badges</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button id="mobile-nav-quests" class="nav-item w-full text-left px-4 py-3 rounded-md flex items-center space-x-3 text-slate-300 hover:text-cyan-400 transition">
+                            <i class="fas fa-flag-checkered w-5 text-center"></i>
+                            <span>Quests</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button id="mobile-nav-progress" class="nav-item w-full text-left px-4 py-3 rounded-md flex items-center space-x-3 text-slate-300 hover:text-cyan-400 transition">
+                            <i class="fas fa-chart-line w-5 text-center"></i>
+                            <span>Progress</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="section-content">
+            <div class="mb-12">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- XP Progress -->
+                    <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-slate-300">Your XP</h3>
+                            <span class="text-cyan-400 font-bold">Level 5</span>
+                        </div>
+                        <div class="relative w-full h-3 bg-slate-700 rounded-full mb-2">
+                            <div class="absolute top-0 left-0 h-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full" style="width: 65%"></div>
+                        </div>
+                        <div class="flex justify-between text-sm text-slate-400">
+                            <span>1,250 XP</span>
+                            <span>2,000 XP to next level</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Current Rank -->
+                    <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-amber-500/20 p-3 rounded-full">
+                                <i class="fas fa-crown text-amber-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-medium text-slate-300">Your Rank</h3>
+                                <p class="text-amber-400 font-bold">#12 Scholar</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Badges Count -->
+                    <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-purple-500/20 p-3 rounded-full">
+                                <i class="fas fa-medal text-purple-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-medium text-slate-300">Badges</h3>
+                                <p class="text-purple-400 font-bold">8 Achieved</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Streak -->
+                    <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-red-500/20 p-3 rounded-full">
+                                <i class="fas fa-fire text-red-400 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-medium text-slate-300">Study Streak</h3>
+                                <p class="text-red-400 font-bold">14 Days</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Motivational Quotes -->
+            <section class="mb-12">
+                <div class="bg-gradient-to-r from-slate-800 to-slate-700 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                    <h2 class="text-2xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Daily Motivation</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-slate-800/70 border border-slate-700/50 rounded-xl p-6 hover:border-cyan-400/50 transition">
+                            <i class="fas fa-quote-left text-cyan-400 text-2xl mb-4"></i>
+                            <p class="text-slate-300 italic mb-4">"Success is the sum of small efforts, repeated day in and day out."</p>
+                            <p class="text-slate-500">- Robert Collier</p>
+                        </div>
+                        <div class="bg-slate-800/70 border border-slate-700/50 rounded-xl p-6 hover:border-cyan-400/50 transition">
+                            <i class="fas fa-quote-left text-cyan-400 text-2xl mb-4"></i>
+                            <p class="text-slate-300 italic mb-4">"The expert in anything was once a beginner. Keep going!"</p>
+                            <p class="text-slate-500">- Helen Hayes</p>
+                        </div>
+                        <div class="bg-slate-800/70 border border-slate-700/50 rounded-xl p-6 hover:border-cyan-400/50 transition">
+                            <i class="fas fa-quote-left text-cyan-400 text-2xl mb-4"></i>
+                            <p class="text-slate-300 italic mb-4">"Your education is a dress rehearsal for a life that is yours to lead."</p>
+                            <p class="text-slate-500">- Nora Ephron</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- Leaderboard Section (Hidden by default) -->
+        <section id="leaderboard-section" class="section-content hidden">
+            <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Top Scholars</h2>
+                    <div class="flex space-x-2">
+                        <button class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 transition">Weekly</button>
+                        <button class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-white transition">Monthly</button>
+                        <button class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 transition">All Time</button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-slate-400 border-b border-slate-700">
+                                <th class="pb-4">Rank</th>
+                                <th class="pb-4">Scholar</th>
+                                <th class="pb-4">XP</th>
+                                <th class="pb-4">Level</th>
+                                <th class="pb-4">Badges</th>
+                                <th class="pb-4">Department</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Top 1 -->
+                            <tr class="border-b border-slate-700 hover:bg-slate-800/50 transition">
+                                <td class="py-4">
+                                    <div class="w-8 h-8 flex items-center justify-center bg-amber-500 rounded-full text-white font-bold">1</div>
+                                </td>
+                                <td class="py-4">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-10 h-10 rounded-full border-2 border-amber-400">
+                                        <div>
+                                            <p class="font-medium">Sarah Johnson</p>
+                                            <p class="text-sm text-slate-500">Computer Science</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 font-bold text-amber-400">8,750</td>
+                                <td class="py-4">12</td>
+                                <td class="py-4">
+                                    <div class="flex -space-x-2">
+                                        <img src="https://via.placeholder.com/30" alt="Badge" class="w-6 h-6 rounded-full border border-slate-600">
+                                        <img src="https://via.placeholder.com/30" alt="Badge" class="w-6 h-6 rounded-full border border-slate-600">
+                                        <img src="https://via.placeholder.com/30" alt="Badge" class="w-6 h-6 rounded-full border border-slate-600">
+                                        <div class="w-6 h-6 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center text-xs">+5</div>
+                                    </div>
+                                </td>
+                                <td class="py-4 text-slate-400">Engineering</td>
+                            </tr>
+                            
+                            <!-- Top 2 -->
+                            <tr class="border-b border-slate-700 hover:bg-slate-800/50 transition">
+                                <td class="py-4">
+                                    <div class="w-8 h-8 flex items-center justify-center bg-slate-600 rounded-full text-white font-bold">2</div>
+                                </td>
+                                <td class="py-4">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-10 h-10 rounded-full border-2 border-slate-400">
+                                        <div>
+                                            <p class="font-medium">Michael Chen</p>
+                                            <p class="text-sm text-slate-500">Data Science</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 font-bold text-slate-300">7,890</td>
+                                <td class="py-4">11</td>
+                                <td class="py-4">
+                                    <div class="flex -space-x-2">
+                                        <img src="https://via.placeholder.com/30" alt="Badge" class="w-6 h-6 rounded-full border border-slate-600">
+                                        <img src="https://via.placeholder.com/30" alt="Badge" class="w-6 h-6 rounded-full border border-slate-600">
+                                        <div class="w-6 h-6 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center text-xs">+4</div>
+                                    </div>
+                                </td>
+                                <td class="py-4 text-slate-400">Science</td>
+                            </tr>
+                            
+                            <!-- Current User (Rank 12) -->
+                            <tr class="bg-slate-800/70 border-b border-slate-700 hover:bg-slate-800/50 transition">
+                                <td class="py-4">
+                                    <div class="w-8 h-8 flex items-center justify-center bg-cyan-600 rounded-full text-white font-bold">12</div>
+                                </td>
+                                <td class="py-4">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-10 h-10 rounded-full border-2 border-cyan-400">
+                                        <div>
+                                            <p class="font-medium">John Doe</p>
+                                            <p class="text-sm text-slate-500">Computer Science</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 font-bold text-cyan-400">5,430</td>
+                                <td class="py-4">8</td>
+                                <td class="py-4">
+                                    <div class="flex -space-x-2">
+                                        <img src="https://via.placeholder.com/30" alt="Badge" class="w-6 h-6 rounded-full border border-slate-600">
+                                        <div class="w-6 h-6 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center text-xs">+2</div>
+                                    </div>
+                                </td>
+                                <td class="py-4 text-slate-400">Engineering</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Badges Section (Hidden by default) -->
+        <section id="badges-section" class="section-content hidden">
+            <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Achievement Badges</h2>
+                    <div class="flex space-x-2">
+                        <button class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-white transition">All Badges</button>
+                        <button class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 transition">Earned</button>
+                        <button class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 transition">Available</button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                    <!-- Badge 1 - Earned -->
+                    <div class="badge-card bg-slate-800/70 border border-slate-700/50 rounded-xl p-6 text-center">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                            <i class="fas fa-medal text-white text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-amber-400 mb-1">Fast Learner</h3>
+                        <p class="text-sm text-slate-400">Complete 5 courses in one month</p>
+                        <div class="mt-3 text-xs text-amber-400">
+                            <i class="fas fa-check-circle"></i> Earned: 12/05/2023
+                        </div>
+                    </div>
+                    
+                    <!-- Badge 2 - Earned -->
+                    <div class="badge-card bg-slate-800/70 border border-slate-700/50 rounded-xl p-6 text-center">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                            <i class="fas fa-fire text-white text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-blue-400 mb-1">7-Day Streak</h3>
+                        <p class="text-sm text-slate-400">Study for 7 consecutive days</p>
+                        <div class="mt-3 text-xs text-blue-400">
+                            <i class="fas fa-check-circle"></i> Earned: 10/15/2023
+                        </div>
+                    </div>
+                    
+                    <!-- Badge 3 - Earned -->
+                    <div class="badge-card bg-slate-800/70 border border-slate-700/50 rounded-xl p-6 text-center">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                            <i class="fas fa-star text-white text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-purple-400 mb-1">Top Performer</h3>
+                        <p class="text-sm text-slate-400">Score 90%+ in 3 assessments</p>
+                        <div class="mt-3 text-xs text-purple-400">
+                            <i class="fas fa-check-circle"></i> Earned: 09/22/2023
+                        </div>
+                    </div>
+                    
+                    <!-- Badge 4 - Locked -->
+                    <div class="badge-card bg-slate-800/70 border border-slate-700/50 rounded-xl p-6 text-center opacity-60">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-lg shadow-slate-500/20 relative">
+                            <i class="fas fa-lock text-slate-400 text-3xl"></i>
+                            <div class="absolute -top-2 -right-2 bg-slate-700 rounded-full w-6 h-6 flex items-center justify-center">
+                                <span class="text-xs text-slate-300">30%</span>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-slate-400 mb-1">Master Scholar</h3>
+                        <p class="text-sm text-slate-500">Reach Level 10</p>
+                        <div class="mt-3 text-xs text-slate-500">
+                            <i class="fas fa-lock"></i> In Progress
+                        </div>
+                    </div>
+                    
+                    <!-- Badge 5 - Locked -->
+                    <div class="badge-card bg-slate-800/70 border border-slate-700/50 rounded-xl p-6 text-center opacity-60">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-lg shadow-slate-500/20 relative">
+                            <i class="fas fa-lock text-slate-400 text-3xl"></i>
+                            <div class="absolute -top-2 -right-2 bg-slate-700 rounded-full w-6 h-6 flex items-center justify-center">
+                                <span class="text-xs text-slate-300">15%</span>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-slate-400 mb-1">Discussion Leader</h3>
+                        <p class="text-sm text-slate-500">Start 10 forum discussions</p>
+                        <div class="mt-3 text-xs text-slate-500">
+                            <i class="fas fa-lock"></i> 2/10 completed
+                        </div>
+                    </div>
+                    
+                    <!-- Badge 6 - Locked -->
+                    <div class="badge-card bg-slate-800/70 border border-slate-700/50 rounded-xl p-6 text-center opacity-60">
+                        <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-lg shadow-slate-500/20">
+                            <i class="fas fa-lock text-slate-400 text-3xl"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-400 mb-1">Perfect Attendance</h3>
+                        <p class="text-sm text-slate-500">Attend all classes for a month</p>
+                        <div class="mt-3 text-xs text-slate-500">
+                            <i class="fas fa-lock"></i> Not started
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quests Section (Hidden by default) -->
+        <section id="quests-section" class="section-content hidden">
+            <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Current Quests</h2>
+                    <button class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-white transition">View All</button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Quest 1 -->
+                    <div class="bg-slate-800/70 border border-slate-700/50 rounded-xl p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="bg-green-500/20 p-2 rounded-lg">
+                                <i class="fas fa-book-open text-green-400"></i>
+                            </div>
+                            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Active</span>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Weekly Reading Challenge</h3>
+                        <p class="text-sm text-slate-400 mb-4">Read 5 chapters this week to earn bonus XP</p>
+                        <div class="mb-3">
+                            <div class="flex justify-between text-sm text-slate-400 mb-1">
+                                <span>Progress</span>
+                                <span>2/5 chapters</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 40%"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-500">Ends in 3 days</span>
+                            <span class="text-green-400 font-bold">+150 XP</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Quest 2 -->
+                    <div class="bg-slate-800/70 border border-slate-700/50 rounded-xl p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="bg-blue-500/20 p-2 rounded-lg">
+                                <i class="fas fa-users text-blue-400"></i>
+                            </div>
+                            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Active</span>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Study Group Participation</h3>
+                        <p class="text-sm text-slate-400 mb-4">Join 2 study group sessions this week</p>
+                        <div class="mb-3">
+                            <div class="flex justify-between text-sm text-slate-400 mb-1">
+                                <span>Progress</span>
+                                <span>1/2 sessions</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-2">
+                                <div class="bg-blue-500 h-2 rounded-full" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-500">Ends in 5 days</span>
+                            <span class="text-blue-400 font-bold">+100 XP</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Quest 3 -->
+                    <div class="bg-slate-800/70 border border-slate-700/50 rounded-xl p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="bg-purple-500/20 p-2 rounded-lg">
+                                <i class="fas fa-trophy text-purple-400"></i>
+                            </div>
+                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">New</span>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Midterm Prep Master</h3>
+                        <p class="text-sm text-slate-400 mb-4">Complete all practice tests for upcoming midterms</p>
+                        <div class="mb-3">
+                            <div class="flex justify-between text-sm text-slate-400 mb-1">
+                                <span>Progress</span>
+                                <span>0/4 tests</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-2">
+                                <div class="bg-purple-500 h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-500">Ends in 2 weeks</span>
+                            <span class="text-purple-400 font-bold">+300 XP</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Progress Section (Hidden by default) -->
+        <section id="progress-section" class="section-content hidden">
+            <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 backdrop-blur-sm">
+                <h2 class="text-2xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Your Learning Progress</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- Course Completion -->
+                    <div class="bg-slate-800/70 border border-slate-700/50 rounded-xl p-6">
+                        <h3 class="text-lg font-medium text-slate-300 mb-4">Course Completion</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm text-slate-400 mb-1">
+                                    <span>Introduction to Programming</span>
+                                    <span>85%</span>
+                                </div>
+                                <div class="w-full bg-slate-700 rounded-full h-2">
+                                    <div class="bg-cyan-500 h-2 rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm text-slate-400 mb-1">
+                                    <span>Data Structures</span>
+                                    <span>62%</span>
+                                </div>
+                                <div class="w-full bg-slate-700 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 62%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm text-slate-400 mb-1">
+                                    <span>Algorithms</span>
+                                    <span>45%</span>
+                                </div>
+                                <div class="w-full bg-slate-700 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 45%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Study Hours -->
+                    <div class="bg-slate-800/70 border border-slate-700/50 rounded-xl p-6">
+                        <h3 class="text-lg font-medium text-slate-300 mb-4">Weekly Study Hours</h3>
+                        <div class="h-64">
+                            <!-- This would be a chart in a real implementation -->
+                            <div class="flex items-end h-48 space-x-2">
+                                <div class="flex-1 bg-cyan-500/50 rounded-t" style="height: 30%"></div>
+                                <div class="flex-1 bg-cyan-500/70 rounded-t" style="height: 50%"></div>
+                                <div class="flex-1 bg-cyan-500 rounded-t" style="height: 70%"></div>
+                                <div class="flex-1 bg-cyan-500/80 rounded-t" style="height: 60%"></div>
+                                <div class="flex-1 bg-cyan-500/60 rounded-t" style="height: 40%"></div>
+                                <div class="flex-1 bg-cyan-500/90 rounded-t" style="height: 65%"></div>
+                                <div class="flex-1 bg-cyan-500/50 rounded-t" style="height: 35%"></div>
+                            </div>
+                            <div class="flex justify-between mt-2 text-xs text-slate-400">
+                                <span>Mon</span>
+                                <span>Tue</span>
+                                <span>Wed</span>
+                                <span>Thu</span>
+                                <span>Fri</span>
+                                <span>Sat</span>
+                                <span>Sun</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="bg-slate-800/70 border border-slate-700/50 rounded-xl p-6">
+                    <h3 class="text-lg font-medium text-slate-300 mb-4">Recent Activity</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-green-500/20 p-2 rounded-full">
+                                <i class="fas fa-check text-green-400"></i>
+                            </div>
+                            <div>
+                                <p class="text-slate-300">Completed "Sorting Algorithms" quiz</p>
+                                <p class="text-sm text-slate-500">Today, 10:45 AM • <span class="text-green-400">+25 XP</span></p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-blue-500/20 p-2 rounded-full">
+                                <i class="fas fa-book-open text-blue-400"></i>
+                            </div>
+                            <div>
+                                <p class="text-slate-300">Read Chapter 3 of "Data Structures"</p>
+                                <p class="text-sm text-slate-500">Yesterday, 8:30 PM • <span class="text-blue-400">+15 XP</span></p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-purple-500/20 p-2 rounded-full">
+                                <i class="fas fa-comment-dots text-purple-400"></i>
+                            </div>
+                            <div>
+                                <p class="text-slate-300">Participated in "Algorithm Optimization" discussion</p>
+                                <p class="text-sm text-slate-500">Yesterday, 4:15 PM • <span class="text-purple-400">+10 XP</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800/50 border-t border-slate-700/50 mt-12 backdrop-blur-sm">
+        <div class="container mx-auto px-6 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">EduFutur</h3>
+                    <p class="text-slate-400">Gamifying education to make learning engaging, rewarding, and fun for students worldwide.</p>
+                </div>
+                <div>
+                    <h4 class="text-slate-300 font-medium mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-slate-400 hover:text-cyan-400 transition">Dashboard</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-cyan-400 transition">Leaderboard</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-cyan-400 transition">Badges</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-cyan-400 transition">Quests</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-slate-300 font-medium mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-slate-400 hover:text-cyan-400 transition">Study Tips</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-cyan-400 transition">Time Management</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-cyan-400 transition">Motivational Quotes</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-cyan-400 transition">Academic Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-slate-300 font-medium mb-4">Connect With Us</h4>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 hover:bg-cyan-600 hover:text-white transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 hover:bg-blue-600 hover:text-white transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 hover:bg-pink-600 hover:text-white transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 hover:bg-red-600 hover:text-white transition">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                    <p class="text-sm text-slate-500">© 2023 EduFutur. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/backend/public/js/cursor.js"></script>
+    <script src="/backend/public/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation functionality
+            const navButtons = {
+                dashboard: document.getElementById('nav-dashboard'),
+                leaderboard: document.getElementById('nav-leaderboard'),
+                badges: document.getElementById('nav-badges'),
+                quests: document.getElementById('nav-quests'),
+                progress: document.getElementById('nav-progress'),
+                
+                // Mobile buttons
+                mobileDashboard: document.getElementById('mobile-nav-dashboard'),
+                mobileLeaderboard: document.getElementById('mobile-nav-leaderboard'),
+                mobileBadges: document.getElementById('mobile-nav-badges'),
+                mobileQuests: document.getElementById('mobile-nav-quests'),
+                mobileProgress: document.getElementById('mobile-nav-progress')
+            };
+            
+            const sections = {
+                dashboard: document.getElementById('dashboard-section'),
+                leaderboard: document.getElementById('leaderboard-section'),
+                badges: document.getElementById('badges-section'),
+                quests: document.getElementById('quests-section'),
+                progress: document.getElementById('progress-section')
+            };
+            
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Navigation function
+            function navigateTo(section) {
+                // Hide all sections
+                Object.values(sections).forEach(sec => sec.classList.add('hidden'));
+                
+                // Remove active class from all nav buttons
+                document.querySelectorAll('.nav-item').forEach(btn => {
+                    btn.classList.remove('nav-active');
+                    btn.classList.remove('text-cyan-400');
+                    btn.classList.add('text-slate-300');
+                });
+                
+                // Show the selected section
+                sections[section].classList.remove('hidden');
+                
+                // Set active state on both desktop and mobile buttons
+                const desktopBtn = navButtons[section];
+                const mobileBtn = navButtons[mobile${section.charAt(0).toUpperCase() + section.slice(1)}];
+                
+                if (desktopBtn) {
+                    desktopBtn.classList.add('nav-active', 'text-cyan-400');
+                    desktopBtn.classList.remove('text-slate-300');
+                }
+                
+                if (mobileBtn) {
+                    mobileBtn.classList.add('nav-active', 'text-cyan-400');
+                    mobileBtn.classList.remove('text-slate-300');
+                }
+                
+                // Close mobile menu if open
+                mobileMenu.classList.add('hidden');
+            }
+            
+            // Add click event listeners to all navigation buttons
+            navButtons.dashboard.addEventListener('click', () => navigateTo('dashboard'));
+            navButtons.leaderboard.addEventListener('click', () => navigateTo('leaderboard'));
+            navButtons.badges.addEventListener('click', () => navigateTo('badges'));
+            navButtons.quests.addEventListener('click', () => navigateTo('quests'));
+            navButtons.progress.addEventListener('click', () => navigateTo('progress'));
+            
+            // Mobile navigation
+            navButtons.mobileDashboard.addEventListener('click', () => navigateTo('dashboard'));
+            navButtons.mobileLeaderboard.addEventListener('click', () => navigateTo('leaderboard'));
+            navButtons.mobileBadges.addEventListener('click', () => navigateTo('badges'));
+            navButtons.mobileQuests.addEventListener('click', () => navigateTo('quests'));
+            navButtons.mobileProgress.addEventListener('click', () => navigateTo('progress'));
+            
+            // Initialize with dashboard visible
+            navigateTo('dashboard');
+            
+            // Badge hover effects
+            const badges = document.querySelectorAll('.badge-card');
+            badges.forEach(badge => {
+                badge.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.2)';
+                });
+                
+                badge.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                    this.style.boxShadow = '';
+                });
+            });
+            
+            // Motivational quote rotation
+            const quotes = [
+                {
+                    text: "The beautiful thing about learning is that no one can take it away from you.",
+                    author: "B.B. King"
+                },
+                {
+                    text: "Education is the most powerful weapon which you can use to change the world.",
+                    author: "Nelson Mandela"
+                },
+                {
+                    text: "The more that you read, the more things you will know. The more that you learn, the more places you'll go.",
+                    author: "Dr. Seuss"
+                },
+                {
+                    text: "Success is the sum of small efforts, repeated day in and day out.",
+                    author: "Robert Collier"
+                },
+                {
+                    text: "The expert in anything was once a beginner. Keep going!",
+                    author: "Helen Hayes"
+                }
+            ];
+            
+            // Rotate quotes every 10 seconds
+            setInterval(() => {
+                const quoteElements = document.querySelectorAll('.motivational-quote');
+                quoteElements.forEach((el, index) => {
+                    const nextIndex = (index + 1) % quotes.length;
+                    el.querySelector('p:nth-child(2)').textContent = "${quotes[nextIndex].text}";
+                    el.querySelector('p:nth-child(3)').textContent = - ${quotes[nextIndex].author};
+                });
+            }, 10000);
+        });
+    </script>
+</body>
+</html>

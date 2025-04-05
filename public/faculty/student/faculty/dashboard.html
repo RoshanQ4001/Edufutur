@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Dashboard | EduFutur</title>
+    <!-- CDN Imports -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@framerjs/dom@0.1.0/dist/framer.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #0ea5e9;
+            --secondary: #7dd3fc;
+            --accent: #f59e0b;
+            --dark: #0f172a;
+            --light: #e2e8f0;
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif;
+            cursor: none; 
+            background-color: var(--dark); 
+            color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        /* Custom Cursor */
+        .custom-cursor {
+            position: fixed; 
+            width: 12px; 
+            height: 12px; 
+            border-radius: 50%;
+            background: var(--primary); 
+            pointer-events: none;
+            mix-blend-mode: screen; 
+            z-index: 9999; 
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease;
+        }
+        
+        .cursor-follower {
+            position: fixed; 
+            width: 30px; 
+            height: 30px; 
+            border: 1px solid rgba(101, 163, 255, 0.5);
+            border-radius: 50%; 
+            pointer-events: none; 
+            z-index: 9998;
+            transform: translate(-50%, -50%); 
+            transition: transform 0.4s ease, width 0.4s ease, height 0.4s ease, background 0.2s ease;
+        }
+        
+        .cursor-active .custom-cursor {
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+        }
+        
+        .cursor-active .cursor-follower {
+            width: 50px; 
+            height: 50px; 
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+        
+        .cursor-click .cursor-follower {
+            width: 40px;
+            height: 40px;
+            background: rgba(245, 158, 11, 0.2);
+        }
+        
+        /* Glass Morphism */
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Gradient Text */
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Animated Underline */
+        .underline-animate {
+            position: relative;
+        }
+        
+        .underline-animate:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .underline-animate:hover:after {
+            width: 100%;
+        }
+        
+        /* Floating Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* Grid Pattern */
+        .grid-pattern {
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-slate-900 text-slate-100">
+    <!-- Custom Cursor Elements -->
+    <div class="custom-cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-slate-800/80 backdrop-blur-md border-r border-slate-700">
+            <div class="p-4 border-b border-slate-700">
+                <a href="index.html" class="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-500 gradient-text flex items-center">
+                    <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_vybwn7df.json" background="transparent" speed="1" style="width: 30px; height: 30px;" loop autoplay></lottie-player>
+                    <span class="ml-2">Faculty Portal</span>
+                </a>
+            </div>
+            <nav class="p-4 space-y-2">
+                <a href="dashboard.html" class="block px-4 py-3 rounded-lg bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-white border border-purple-500/30 transition-all">
+                    <i class="fas fa-chart-line mr-3"></i> Dashboard
+                </a>
+                <a href="courses.html" class="block px-4 py-3 rounded-lg hover:bg-slate-700/50 text-slate-300 hover:text-white transition-all border border-transparent hover:border-slate-600">
+                    <i class="fas fa-book mr-3"></i> My Courses
+                </a>
+                <a href="assignments.html" class="block px-4 py-3 rounded-lg hover:bg-slate-700/50 text-slate-300 hover:text-white transition-all border border-transparent hover:border-slate-600">
+                    <i class="fas fa-tasks mr-3"></i> Assignments
+                </a>
+                <a href="students.html" class="block px-4 py-3 rounded-lg hover:bg-slate-700/50 text-slate-300 hover:text-white transition-all border border-transparent hover:border-slate-600">
+                    <i class="fas fa-users mr-3"></i> Students
+                </a>
+                <a href="index.html" class="block px-4 py-3 rounded-lg hover:bg-slate-700/50 text-slate-300 hover:text-white transition-all border border-transparent hover:border-slate-600">
+                    <i class="fas fa-chart-pie mr-3"></i> Home page
+                </a>
+               
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <header class="bg-slate-800/80 backdrop-blur-md border-b border-slate-700 p-4 sticky top-0 z-40">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">Faculty Dashboard</h2>
+                    <div class="flex items-center space-x-4">
+                        <button class="p-2 rounded-full hover:bg-slate-700/50 transition-all relative group">
+                            <i class="fas fa-bell text-slate-300"></i>
+                            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
+                        <div class="flex items-center space-x-3">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Faculty" class="w-8 h-8 rounded-full border-2 border-purple-500">
+                            <div>
+                                <p class="text-sm font-medium">Dr. Sarah Johnson</p>
+                                <p class="text-xs text-slate-400">Computer Science</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <main class="p-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="glass p-6 rounded-xl border border-slate-800 hover:border-purple-500/30 transition-all transform hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-slate-400 mb-2">My Courses</h3>
+                                <p class="text-3xl font-bold text-white">5</p>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center">
+                                <i class="fas fa-book text-purple-400 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-800">
+                            <p class="text-xs text-slate-400 flex items-center">
+                                <span class="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+                                <span>2 new this semester</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="glass p-6 rounded-xl border border-slate-800 hover:border-blue-500/30 transition-all transform hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-slate-400 mb-2">Pending Grading</h3>
+                                <p class="text-3xl font-bold text-white">23</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center">
+                                <i class="fas fa-tasks text-blue-400 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-800">
+                            <p class="text-xs text-slate-400 flex items-center">
+                                <span class="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+                                <span>5 overdue</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="glass p-6 rounded-xl border border-slate-800 hover:border-cyan-500/30 transition-all transform hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-slate-400 mb-2">Active Students</h3>
+                                <p class="text-3xl font-bold text-white">142</p>
+                            </div>
+                            <div class="w-12 h-12 bg-cyan-500/10 rounded-full flex items-center justify-center">
+                                <i class="fas fa-users text-cyan-400 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-800">
+                            <p class="text-xs text-slate-400 flex items-center">
+                                <span class="w-2 h-2 bg-cyan-400 rounded-full mr-2"></span>
+                                <span>92% engagement</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="glass p-6 rounded-xl border border-slate-800 hover:border-amber-500/30 transition-all transform hover:-translate-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-slate-400 mb-2">Avg. Performance</h3>
+                                <p class="text-3xl font-bold text-amber-400">84%</p>
+                            </div>
+                            <div class="w-12 h-12 bg-amber-500/10 rounded-full flex items-center justify-center">
+                                <i class="fas fa-chart-line text-amber-400 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-800">
+                            <p class="text-xs text-slate-400 flex items-center">
+                                <span class="w-2 h-2 bg-amber-400 rounded-full mr-2"></span>
+                                <span>+3% from last term</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upcoming Deadlines -->
+                <div class="glass p-6 rounded-xl border border-slate-800 mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-semibold">Upcoming Deadlines</h3>
+                        <a href="#" class="text-sm text-purple-400 hover:text-purple-300 transition-colors underline-animate">
+                            View All <i class="fas fa-chevron-right ml-1"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start p-4 rounded-lg hover:bg-slate-800/50 transition-all border border-transparent hover:border-slate-700">
+                            <div class="bg-purple-500/10 p-3 rounded-lg mr-4">
+                                <i class="fas fa-tasks text-purple-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="font-medium">Data Structures Assignment</p>
+                                        <p class="text-sm text-slate-400">Due in 3 days - 42 submissions received</p>
+                                        <p class="text-xs text-slate-500 mt-1">CS-201 | Fall 2023</p>
+                                    </div>
+                                    <span class="px-3 py-1 rounded-full text-xs bg-purple-900/50 text-purple-400">Grading</span>
+                                </div>
+                                <div class="mt-3 w-full bg-slate-800 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 65%"></div>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">65% graded (28/42)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-4 rounded-lg hover:bg-slate-800/50 transition-all border border-transparent hover:border-slate-700">
+                            <div class="bg-blue-500/10 p-3 rounded-lg mr-4">
+                                <i class="fas fa-file-alt text-blue-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="font-medium">Database Systems Project</p>
+                                        <p class="text-sm text-slate-400">Due in 5 days - 18 submissions received</p>
+                                        <p class="text-xs text-slate-500 mt-1">CS-202 | Fall 2023</p>
+                                    </div>
+                                    <span class="px-3 py-1 rounded-full text-xs bg-blue-900/50 text-blue-400">Review</span>
+                                </div>
+                                <div class="mt-3 w-full bg-slate-800 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 22%"></div>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">22% reviewed (4/18)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start p-4 rounded-lg hover:bg-slate-800/50 transition-all border border-transparent hover:border-slate-700">
+                            <div class="bg-amber-500/10 p-3 rounded-lg mr-4">
+                                <i class="fas fa-chalkboard-teacher text-amber-400"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="font-medium">Midterm Exam Grading</p>
+                                        <p class="text-sm text-slate-400">Due in 7 days - 127 submissions</p>
+                                        <p class="text-xs text-slate-500 mt-1">CS-101 | Fall 2023</p>
+                                    </div>
+                                    <span class="px-3 py-1 rounded-full text-xs bg-amber-900/50 text-amber-400">Pending</span>
+                                </div>
+                                <div class="mt-3 w-full bg-slate-800 rounded-full h-2">
+                                    <div class="bg-amber-500 h-2 rounded-full" style="width: 10%"></div>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">10% completed (13/127)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass p-6 rounded-xl border border-slate-800">
+                        <h3 class="text-xl font-semibold mb-4">Recent Messages</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start p-3 rounded-lg hover:bg-slate-800/50 transition-all">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Student" class="w-10 h-10 rounded-full border-2 border-cyan-500 mr-4">
+                                <div>
+                                    <p class="font-medium">Michael Chen</p>
+                                    <p class="text-sm text-slate-400 truncate">Question about the upcoming assignment requirements and grading rubric...</p>
+                                    <p class="text-xs text-slate-500 mt-1">2 hours ago</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start p-3 rounded-lg hover:bg-slate-800/50 transition-all">
+                                <img src="https://randomuser.me/api/portraits/women/28.jpg" alt="Student" class="w-10 h-10 rounded-full border-2 border-purple-500 mr-4">
+                                <div>
+                                    <p class="font-medium">Emma Rodriguez</p>
+                                    <p class="text-sm text-slate-400 truncate">Request for extension on the database project due to technical issues...</p>
+                                    <p class="text-xs text-slate-500 mt-1">5 hours ago</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start p-3 rounded-lg hover:bg-slate-800/50 transition-all">
+                                <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Student" class="w-10 h-10 rounded-full border-2 border-blue-500 mr-4">
+                                <div>
+                                    <p class="font-medium">David Kim</p>
+                                    <p class="text-sm text-slate-400 truncate">Clarification needed on lecture 7 slides regarding normalization concepts...</p>
+                                    <p class="text-xs text-slate-500 mt-1">1 day ago</p>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#" class="mt-4 inline-block text-sm text-purple-400 hover:text-purple-300 transition-colors underline-animate">
+                            View All Messages <i class="fas fa-chevron-right ml-1"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="glass p-6 rounded-xl border border-slate-800">
+                        <h3 class="text-xl font-semibold mb-4">Course Performance</h3>
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <p class="font-medium">CS-201: Data Structures</p>
+                                <p class="text-sm text-slate-400">Fall 2023 | 45 Students</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs bg-emerald-900/50 text-emerald-400">87% Avg</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2 mb-2">
+                            <div class="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full" style="width: 87%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-400 mb-6">
+                            <span>A: 32%</span>
+                            <span>B: 41%</span>
+                            <span>C: 18%</span>
+                            <span>D/F: 9%</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <p class="font-medium">CS-202: Database Systems</p>
+                                <p class="text-sm text-slate-400">Fall 2023 | 38 Students</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs bg-blue-900/50 text-blue-400">79% Avg</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2 mb-2">
+                            <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full" style="width: 79%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-400">
+                            <span>A: 24%</span>
+                            <span>B: 39%</span>
+                            <span>C: 26%</span>
+                            <span>D/F: 11%</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Custom Cursor
+        const cursor = document.querySelector('.custom-cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            setTimeout(() => {
+                cursorFollower.style.left = e.clientX + 'px';
+                cursorFollower.style.top = e.clientY + 'px';
+            }, 100);
+        });
+        
+        // Cursor Effects on Hover
+        const hoverElements = document.querySelectorAll('a, button, .underline-animate, .glass, .hover-effect');
+        
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                document.body.classList.add('cursor-active');
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                document.body.classList.remove('cursor-active');
+            });
+            
+            el.addEventListener('mousedown', () => {
+                document.body.classList.add('cursor-click');
+            });
+            
+            el.addEventListener('mouseup', () => {
+                document.body.classList.remove('cursor-click');
+            });
+        });
+        
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Animate cards on load
+        gsap.utils.toArray('.glass').forEach((card, i) => {
+            gsap.from(card, {
+                opacity: 0,
+                y: 30,
+                duration: 0.8,
+                delay: i * 0.1,
+                ease: "power3.out"
+            });
+        });
+    </script>
+</body>
+</html>

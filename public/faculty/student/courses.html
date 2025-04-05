@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Courses | EduFutur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Same styles as dashboard.html */
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(101, 163, 255, 0.7);
+            pointer-events: none;
+            mix-blend-mode: screen;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease;
+            opacity: 0;
+        }
+        .cursor-follower {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(101, 163, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
+            opacity: 0;
+        }
+        .cursor-active .cursor-follower {
+            width: 60px;
+            height: 60px;
+            background: rgba(101, 163, 255, 0.2);
+        }
+        .course-card {
+            transition: all 0.3s ease;
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04);
+        }
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            background-color: #ef4444;
+            border-radius: 50%;
+        }
+        .sidebar {
+            height: calc(100vh - 4rem);
+        }
+        .main-content {
+            min-height: calc(100vh - 4rem);
+        }
+        .nav-blur {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-slate-900 text-slate-100">
+    <div class="custom-cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <nav class="fixed w-full z-50 bg-slate-900/80 nav-blur border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">EduFutur</span>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6 space-x-4">
+                        <div class="relative">
+                            <button id="notification-btn" class="p-2 rounded-full text-slate-300 hover:text-white hover:bg-slate-800 relative">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-dot"></span>
+                            </button>
+                            <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-72 bg-slate-800 rounded-md shadow-lg z-50 border border-slate-700">
+                                <div class="p-2 border-b border-slate-700">
+                                    <h3 class="text-sm font-medium text-slate-200">Notifications</h3>
+                                </div>
+                                <div class="max-h-60 overflow-y-auto">
+                                    <a href="#" class="block px-4 py-3 text-sm text-slate-300 hover:bg-slate-700 border-b border-slate-700">
+                                        <div class="font-medium">Assignment Due</div>
+                                        <div class="text-xs text-slate-400">CS101 Assignment 2 due tomorrow</div>
+                                    </a>
+                                    <a href="#" class="block px-4 py-3 text-sm text-slate-300 hover:bg-slate-700 border-b border-slate-700">
+                                        <div class="font-medium">New Lecture</div>
+                                        <div class="text-xs text-slate-400">New lecture uploaded for Math202</div>
+                                    </a>
+                                    <a href="#" class="block px-4 py-3 text-sm text-slate-300 hover:bg-slate-700">
+                                        <div class="font-medium">Quiz Results</div>
+                                        <div class="text-xs text-slate-400">Your Physics101 quiz results are available</div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <button id="profile-btn" class="flex items-center space-x-2 p-2 rounded-full hover:bg-slate-800">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-white font-medium">JS</div>
+                                <span class="text-slate-300">John Smith</span>
+                            </button>
+                            <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-slate-800 rounded-md shadow-lg z-50 border border-slate-700">
+                                <a href="#" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">Profile</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700">Settings</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 border-t border-slate-700">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-16 flex">
+        <!-- Sidebar -->
+        <aside class="hidden md:block w-64 fixed bg-slate-800/50 border-r border-slate-700 p-4 sidebar">
+            <div class="space-y-6">
+                <div class="p-4 rounded-lg bg-slate-800/50">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-white font-medium text-xl">JS</div>
+                        <div>
+                            <h3 class="text-lg font-medium text-white">John Smith</h3>
+                            <p class="text-sm text-slate-400">Computer Science</p>
+                        </div>
+                    </div>
+                </div>
+
+                <nav class="space-y-1">
+                    <a href="dashboard.html" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-300 hover:bg-slate-700 hover:text-white">
+                        <i class="fas fa-tachometer-alt mr-3 text-cyan-400"></i>
+                        Dashboard
+                    </a>
+                    <a href="courses.html" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg bg-slate-700 text-white">
+                        <i class="fas fa-book mr-3 text-blue-400"></i>
+                        My Courses
+                    </a>
+                    
+                    
+                    <a href="grades.html" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-300 hover:bg-slate-700 hover:text-white">
+                        <i class="fas fa-chart-line mr-3 text-yellow-400"></i>
+                        Grades & Analytics
+                    </a>
+                   
+                    <a href="#" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-slate-300 hover:bg-slate-700 hover:text-white">
+                        <i class="fas fa-cog mr-3 text-slate-400"></i>
+                        Settings
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 p-6 main-content">
+            <!-- Page Header -->
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-2xl md:text-3xl font-bold text-white">My Courses</h1>
+                <a href="#" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700 transition-all shadow-lg shadow-cyan-500/20">
+                    Enroll in New Course
+                </a>
+            </div>
+
+            <!-- Current Courses -->
+            <div class="mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="courses-container">
+                    <!-- Course Card 1 -->
+                    <div class="course-card bg-slate-800/50 rounded-xl overflow-hidden border border-slate-700 transition-all duration-300 hover:border-cyan-500/30">
+                        <div class="h-32 bg-gradient-to-r from-cyan-600 to-blue-700"></div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-lg font-bold text-white">CS101 - Introduction to Programming</h3>
+                                <span class="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-400">Active</span>
+                            </div>
+                            <p class="text-sm text-slate-400 mb-4">Learn the fundamentals of programming with Python.</p>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center text-slate-400">
+                                    <i class="fas fa-user mr-2"></i>
+                                    <span>Prof. Johnson</span>
+                                </div>
+                                <a href="#" class="text-cyan-400 hover:text-cyan-300">View Course</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Card 2 -->
+                    <div class="course-card bg-slate-800/50 rounded-xl overflow-hidden border border-slate-700 transition-all duration-300 hover:border-cyan-500/30">
+                        <div class="h-32 bg-gradient-to-r from-purple-600 to-indigo-700"></div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-lg font-bold text-white">Math202 - Linear Algebra</h3>
+                                <span class="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-400">Active</span>
+                            </div>
+                            <p class="text-sm text-slate-400 mb-4">Advanced concepts in linear algebra and matrix theory.</p>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center text-slate-400">
+                                    <i class="fas fa-user mr-2"></i>
+                                    <span>Dr. Williams</span>
+                                </div>
+                                <a href="#" class="text-cyan-400 hover:text-cyan-300">View Course</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Card 3 -->
+                    <div class="course-card bg-slate-800/50 rounded-xl overflow-hidden border border-slate-700 transition-all duration-300 hover:border-cyan-500/30">
+                        <div class="h-32 bg-gradient-to-r from-pink-600 to-rose-700"></div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-lg font-bold text-white">Physics101 - Mechanics</h3>
+                                <span class="text-xs px-2 py-1 rounded-full bg-yellow-500/10 text-yellow-400">Ongoing</span>
+                            </div>
+                            <p class="text-sm text-slate-400 mb-4">Fundamental principles of classical mechanics.</p>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center text-slate-400">
+                                    <i class="fas fa-user mr-2"></i>
+                                    <span>Prof. Davis</span>
+                                </div>
+                                <a href="#" class="text-cyan-400 hover:text-cyan-300">View Course</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Progress -->
+            <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700 mb-8">
+                <h2 class="text-xl font-bold text-white mb-4">Course Progress</h2>
+                <div class="space-y-4">
+                    <!-- CS101 Progress -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium text-white">CS101 - Introduction to Programming</span>
+                            <span class="text-sm text-slate-400">78%</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-2.5">
+                            <div class="bg-cyan-500 h-2.5 rounded-full" style="width: 78%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Math202 Progress -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium text-white">Math202 - Linear Algebra</span>
+                            <span class="text-sm text-slate-400">65%</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-2.5">
+                            <div class="bg-purple-500 h-2.5 rounded-full" style="width: 65%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Physics101 Progress -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium text-white">Physics101 - Mechanics</span>
+                            <span class="text-sm text-slate-400">42%</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-2.5">
+                            <div class="bg-pink-500 h-2.5 rounded-full" style="width: 42%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Custom cursor functionality
+        const cursor = document.querySelector('.custom-cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            setTimeout(() => {
+                cursorFollower.style.left = e.clientX + 'px';
+                cursorFollower.style.top = e.clientY + 'px';
+            }, 100);
+        });
+
+        document.addEventListener('mouseenter', () => {
+            cursor.style.opacity = '1';
+            cursorFollower.style.opacity = '1';
+        });
+
+        document.addEventListener('mouseleave', () => {
+            cursor.style.opacity = '0';
+            cursorFollower.style.opacity = '0';
+        });
+
+        // Make cursor bigger when hovering interactive elements
+        const interactiveElements = document.querySelectorAll('a, button, input, select, textarea, .course-card');
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorFollower.classList.add('cursor-active');
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorFollower.classList.remove('cursor-active');
+            });
+        });
+
+        // Notification dropdown toggle
+        document.getElementById('notification-btn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('notification-dropdown').classList.toggle('hidden');
+            document.getElementById('profile-dropdown').classList.add('hidden');
+        });
+
+        // Profile dropdown toggle
+        document.getElementById('profile-btn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('profile-dropdown').classList.toggle('hidden');
+            document.getElementById('notification-dropdown').classList.add('hidden');
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function() {
+            document.getElementById('notification-dropdown').classList.add('hidden');
+            document.getElementById('profile-dropdown').classList.add('hidden');
+        });
+
+        // GSAP animations for course cards
+        gsap.registerPlugin(ScrollTrigger);
+        
+        gsap.from(".course-card", {
+            scrollTrigger: {
+                trigger: "#courses-container",
+                start: "top 80%",
+                toggleActions: "play none none none"
+            },
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: "power2.out"
+        });
+    </script>
+</body>
+</html>

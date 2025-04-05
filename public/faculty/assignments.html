@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignments | EduFutur</title>
+    <!-- CDN Imports -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@framerjs/dom@0.1.0/dist/framer.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #0ea5e9;
+            --secondary: #7dd3fc;
+            --accent: #f59e0b;
+            --dark: #0f172a;
+            --light: #e2e8f0;
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif;
+            cursor: none; 
+            background-color: var(--dark); 
+            color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        /* Custom Cursor */
+        .custom-cursor {
+            position: fixed; 
+            width: 12px; 
+            height: 12px; 
+            border-radius: 50%;
+            background: var(--primary); 
+            pointer-events: none;
+            mix-blend-mode: screen; 
+            z-index: 9999; 
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease;
+        }
+        
+        .cursor-follower {
+            position: fixed; 
+            width: 30px; 
+            height: 30px; 
+            border: 1px solid rgba(101, 163, 255, 0.5);
+            border-radius: 50%; 
+            pointer-events: none; 
+            z-index: 9998;
+            transform: translate(-50%, -50%); 
+            transition: transform 0.4s ease, width 0.4s ease, height 0.4s ease, background 0.2s ease;
+        }
+        
+        .cursor-active .custom-cursor {
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+        }
+        
+        .cursor-active .cursor-follower {
+            width: 50px; 
+            height: 50px; 
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+        
+        .cursor-click .cursor-follower {
+            width: 40px;
+            height: 40px;
+            background: rgba(245, 158, 11, 0.2);
+        }
+        
+        /* Glass Morphism */
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Gradient Text */
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Animated Underline */
+        .underline-animate {
+            position: relative;
+        }
+        
+        .underline-animate:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .underline-animate:hover:after {
+            width: 100%;
+        }
+        
+        /* Grid Pattern */
+        .grid-pattern {
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        /* Initial state for cards */
+        .assignment-card {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        /* Active nav item */
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(78, 70, 180, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border-left: 3px solid var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-slate-900 text-slate-100">
+    <!-- Custom Cursor Elements -->
+    <!-- <div class="custom-cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <div class="flex h-screen"> -->
+        <!-- Sidebar -->
+        <!-- <div class="w-64 bg-slate-800/80 backdrop-blur-md border-r border-slate-700">
+            <div class="p-4 border-b border-slate-700">
+                <h1 class="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-500 gradient-text flex items-center">
+                    <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_vybwn7df.json" background="transparent" speed="1" style="width: 30px; height: 30px;" loop autoplay></lottie-player>
+                    <span class="ml-2">Faculty Portal</span>
+                </h1>
+            </div>
+            <nav class="p-4 space-y-2">
+                <a href="./dashboard.html" class="nav-item block px-4 py-2 rounded-lg hover:bg-slate-700/50 text-slate-300 transition-colors underline-animate">
+                    <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                </a>
+                <a href="./courses.html" class="nav-item block px-4 py-2 rounded-lg hover:bg-slate-700/50 text-slate-300 transition-colors underline-animate">
+                    <i class="fas fa-book mr-2"></i> My Courses
+                </a>
+                <a href="./assignments.html" class="nav-item active block px-4 py-2 rounded-lg text-white">
+                    <i class="fas fa-tasks mr-2"></i> Assignments
+                </a>
+                <a href="./students.html" class="nav-item block px-4 py-2 rounded-lg hover:bg-slate-700/50 text-slate-300 transition-colors underline-animate">
+                    <i class="fas fa-users mr-2"></i> Students
+                </a>
+            </nav>
+        </div> -->
+        
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto grid-pattern">
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-900/80 to-slate-900/30"></div>
+            
+            <header class="glass border-b border-slate-700 p-4 sticky top-0 z-40">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">Assignments</h2>
+                    <button class="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:from-purple-600 hover:to-blue-700 transition-all shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transform hover:scale-105 active:scale-95">
+                        <i class="fas fa-plus mr-2"></i> Create Assignment
+                    </button>
+                </div>
+            </header>
+            
+            <main class="p-6 relative z-10">
+                <div class="assignment-card glass rounded-xl border border-slate-700 overflow-hidden mb-6 transform hover:-translate-y-1 transition-all">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Data Structures Project</h3>
+                                <p class="text-slate-400">CS-201: Data Structures & Algorithms</p>
+                            </div>
+                            <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-sm font-medium">Pending Grading</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="glass p-4 rounded-lg border border-slate-700">
+                                <p class="text-sm text-slate-400 mb-1">Due Date</p>
+                                <p class="text-slate-100 font-medium">May 15, 2023</p>
+                            </div>
+                            <div class="glass p-4 rounded-lg border border-slate-700">
+                                <p class="text-sm text-slate-400 mb-1">Submissions</p>
+                                <p class="text-slate-100 font-medium">42/45 <span class="text-green-400">(93%)</span></p>
+                            </div>
+                            <div class="glass p-4 rounded-lg border border-slate-700">
+                                <p class="text-sm text-slate-400 mb-1">Average Score</p>
+                                <p class="text-slate-100 font-medium">-</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3">
+                            <button class="px-4 py-2 bg-slate-700/50 rounded-lg text-sm hover:bg-slate-600/50 transition-all border border-slate-600 hover:border-slate-500">
+                                <i class="fas fa-edit mr-2"></i> Edit
+                            </button>
+                            <button class="px-4 py-2 bg-gradient-to-r from-purple-500/30 to-blue-600/30 text-purple-400 rounded-lg text-sm hover:from-purple-600/30 hover:to-blue-700/30 transition-all border border-purple-500/30 hover:border-purple-400/50">
+                                <i class="fas fa-check-circle mr-2"></i> Grade
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Second Assignment Card -->
+                <div class="assignment-card glass rounded-xl border border-slate-700 overflow-hidden mb-6 transform hover:-translate-y-1 transition-all">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Algorithm Analysis Quiz</h3>
+                                <p class="text-slate-400">CS-201: Data Structures & Algorithms</p>
+                            </div>
+                            <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm font-medium">Graded</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="glass p-4 rounded-lg border border-slate-700">
+                                <p class="text-sm text-slate-400 mb-1">Due Date</p>
+                                <p class="text-slate-100 font-medium">May 5, 2023</p>
+                            </div>
+                            <div class="glass p-4 rounded-lg border border-slate-700">
+                                <p class="text-sm text-slate-400 mb-1">Submissions</p>
+                                <p class="text-slate-100 font-medium">45/45 <span class="text-green-400">(100%)</span></p>
+                            </div>
+                            <div class="glass p-4 rounded-lg border border-slate-700">
+                                <p class="text-sm text-slate-400 mb-1">Average Score</p>
+                                <p class="text-slate-100 font-medium">84.5/100</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3">
+                            <button class="px-4 py-2 bg-slate-700/50 rounded-lg text-sm hover:bg-slate-600/50 transition-all border border-slate-600 hover:border-slate-500">
+                                <i class="fas fa-chart-bar mr-2"></i> View Analytics
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Third Assignment Card -->
+                <div class="assignment-card glass rounded-xl border border-slate-700 overflow-hidden mb-6 transform hover:-translate-y-1 transition-all">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Programming Assignment 3</h3>
+                                <div class="flex items-center">
+                                    <p class="text-slate-400">CS-101: Introduction to Programming</p>
+                                    <span class="ml-2 px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full text-xs">Active</span>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-sm font-medium">In Progress</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="glass p-4 rounded-lg border border-slate-700">
+                                <p class="text-sm text-slate-400 mb-1">Due Date</p>
+                                <p class="text-slate-100 font-medium">June 2, 2023</p>
+                            </div>
+                            <div class="glass p-4 rounded-lg border border-slate-700">
+                                <p class="text-sm text-slate-400 mb-1">Submissions</p>
+                                <p class="text-slate-100 font-medium">12/60 <span class="text-yellow-400">(20%)</span></p>
+                            </div>
+                            <div class="glass p-4 rounded-lg border border-slate-700">
+                                <p class="text-sm text-slate-400 mb-1">Days Remaining</p>
+                                <p class="text-slate-100 font-medium">14</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3">
+                            <button class="px-4 py-2 bg-slate-700/50 rounded-lg text-sm hover:bg-slate-600/50 transition-all border border-slate-600 hover:border-slate-500">
+                                <i class="fas fa-edit mr-2"></i> Edit
+                            </button>
+                            <button class="px-4 py-2 bg-gradient-to-r from-cyan-500/30 to-blue-600/30 text-cyan-400 rounded-lg text-sm hover:from-cyan-600/30 hover:to-blue-700/30 transition-all border border-cyan-500/30 hover:border-cyan-400/50">
+                                <i class="fas fa-eye mr-2"></i> View Submissions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Custom Cursor
+            const cursor = document.querySelector('.custom-cursor');
+            const cursorFollower = document.querySelector('.cursor-follower');
+            
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+                
+                setTimeout(() => {
+                    cursorFollower.style.left = e.clientX + 'px';
+                    cursorFollower.style.top = e.clientY + 'px';
+                }, 100);
+            });
+            
+            // Cursor Effects on Hover
+            const hoverElements = document.querySelectorAll('a, button, .underline-animate');
+            
+            hoverElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    document.body.classList.add('cursor-active');
+                });
+                
+                el.addEventListener('mouseleave', () => {
+                    document.body.classList.remove('cursor-active');
+                });
+                
+                el.addEventListener('mousedown', () => {
+                    document.body.classList.add('cursor-click');
+                });
+                
+                el.addEventListener('mouseup', () => {
+                    document.body.classList.remove('cursor-click');
+                });
+            });
+            
+            // GSAP Animations
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // Animate cards on page load
+            gsap.utils.toArray(".assignment-card").forEach((card, i) => {
+                gsap.fromTo(card, 
+                    { opacity: 0, y: 20 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.8,
+                        delay: i * 0.15,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: card,
+                            start: "top 80%",
+                            toggleActions: "play none none none"
+                        }
+                    }
+                );
+            });
+
+            // Highlight current page in navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            const currentPage = window.location.pathname.split('/').pop() || 'assignments.html';
+            
+            navItems.forEach(item => {
+                const link = item.getAttribute('href');
+                if (link.includes(currentPage)) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
